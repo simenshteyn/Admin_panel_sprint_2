@@ -13,6 +13,11 @@ class GenresSerializer(serializers.RelatedField):
         ordering = ['-id']
 
 
+class PeopleSerializer(serializers.RelatedField):
+    def to_representation(self, value):
+        return value.person.full_name
+
+
 class MoviesSerializer(ModelSerializer):
     id = serializers.UUIDField(source='movie_id')
     title = serializers.CharField(source='movie_title')
@@ -21,7 +26,14 @@ class MoviesSerializer(ModelSerializer):
     creation_date = serializers.DateTimeField(format='%Y-%m-%d',
                                               source='created_at')
     rating = serializers.FloatField(source='movie_rating')
-    genres = GenresSerializer(source='movie_genres', read_only=True, many=True)
+    genres = GenresSerializer(source='movie_genres',
+                              read_only=True, many=True)
+    actors = PeopleSerializer(source='actors_field',
+                              many=True, read_only=True)
+    directors = PeopleSerializer(source='directors_field',
+                                 many=True, read_only=True)
+    writers = PeopleSerializer(source='writers_field',
+                               many=True, read_only=True)
 
     class Meta:
         model = Movies
@@ -35,6 +47,6 @@ class MoviesSerializer(ModelSerializer):
                   'genres',
                   'actors',
                   'directors',
-                  'writers',
+                  'writers'
                   ]
         read_only_fields = fields

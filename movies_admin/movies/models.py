@@ -2,7 +2,6 @@ import uuid
 
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models import Prefetch
 from django.utils.translation import gettext_lazy as _
 
 
@@ -95,30 +94,6 @@ class Movies(TimeStampedModel, models.Model):
     def __str__(self):
         return self.movie_title
 
-    def actors(self):
-        result = list([
-            movie_people.full_name for movie_people in self.movie_people
-                .filter(moviepeoplerel__person_role='actor')
-                .distinct('full_name')
-        ])
-        return result
-
-    def directors(self):
-        result = list([
-            movie_people.full_name for movie_people in self.movie_people
-                .filter(moviepeoplerel__person_role='director')
-                .distinct('full_name')
-        ])
-        return result
-
-    def writers(self):
-        result = list([
-            movie_people.full_name for movie_people in self.movie_people
-                .filter(moviepeoplerel__person_role='writer')
-                .distinct('full_name')
-        ])
-        return result
-
 
 class MoviePeople(models.Model):
     class PersonRole(models.TextChoices):
@@ -130,7 +105,7 @@ class MoviePeople(models.Model):
         _('movie people uuid'), primary_key=True, default=uuid.uuid4,
         editable=False, unique=True
     )
-    movie = models.ForeignKey(Movies, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movies, related_name='people_related', on_delete=models.CASCADE)
     person = models.ForeignKey(People, on_delete=models.CASCADE)
     person_role = models.CharField(max_length=10, choices=PersonRole.choices)
 
@@ -138,7 +113,6 @@ class MoviePeople(models.Model):
         verbose_name = _('movie person')
         verbose_name_plural = _('movie people')
         db_table = 'content"."movie_people'
-        default_related_name = 'moviepeoplerel'
 
     def __str__(self):
         return f'{self.movie} ({self.person}, {self.person_role})'
@@ -156,7 +130,6 @@ class MovieGenres(models.Model):
         verbose_name = _('movie genre')
         verbose_name_plural = _('movie genres')
         db_table = 'content"."movie_genres'
-        default_related_name = 'moviegenresrel'
 
     def __str__(self):
         return f'{self.movie} ({self.genre})'

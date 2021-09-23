@@ -7,6 +7,7 @@ class MovieGenresInline(admin.TabularInline):
     model = MovieGenres
     extra = 0
     show_change_link = True
+
     def get_queryset(self, request):
         queryset = super(MovieGenresInline, self).get_queryset(request)
         queryset = queryset.select_related('movie', 'genre')
@@ -18,6 +19,7 @@ class MoviePeopleInline(admin.TabularInline):
     extra = 0
     show_change_link = True
     autocomplete_fields = ('person', 'movie')
+
     def get_queryset(self, request):
         queryset = super(MoviePeopleInline, self).get_queryset(request)
         queryset = queryset.select_related('movie', 'person')
@@ -45,7 +47,6 @@ class MoviesAdmin(admin.ModelAdmin):
     search_fields = ['movie_title']
     ordering = ['movie_title', 'movie_rating']
     inlines = [MovieGenresInline, MoviePeopleInline]
-
 
     def get_queryset(self, request):
         queryset = super(MoviesAdmin, self).get_queryset(request)
