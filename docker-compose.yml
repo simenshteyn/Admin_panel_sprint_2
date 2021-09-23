@@ -28,17 +28,11 @@ services:
       - ./.env
     build:
       context: .
-      dockerfile: ./movies_admin/Dockerfile
+      dockerfile: movies_admin/Djangoapp.dockerfile
     depends_on:
-#      - django_startapp
       - pg_db
     expose:
       - ${DJANGO_APP_PORT}
-    healthcheck:
-      test: ["CMD-SHELL", "curl", "-f", "http://localhost:8000/admin"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
 
 
 # Review response (TODO: delete afterwards). В контейнер было добавлено
@@ -47,8 +41,6 @@ services:
 # Для запуска сервиса без миграций: "docker-compose up". Профилирование
 # позволяет не создавать несколько файлов compose.
   django_startapp:
-    volumes:
-      - static_volume:/app/static
     command: >
       sh -c "python manage.py migrate admin &&
              python manage.py migrate auth &&
@@ -63,7 +55,7 @@ services:
       - ./.env
     build:
       context: .
-      dockerfile: ./movies_admin/Dockerfile
+      dockerfile: movies_admin/Djangostartapp.dockerfile
     depends_on:
       pg_db:
         condition: service_healthy
